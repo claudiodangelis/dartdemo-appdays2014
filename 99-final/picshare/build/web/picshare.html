@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Shoot and share</title>
+    <link rel="stylesheet" href="picshare.css">
+  </head>
+  <body>
+    <div class="view" id="idleView">
+      <!-- input -->
+      <button id="take_picture">Take a picture</button>
+    </div>
+    
+    <div class="view" id="processImageView">
+      <section id="display"><!-- display img -->
+        <canvas id="canvasThumbnail"></canvas>
+        <canvas id="canvas"></canvas>
+      </section>
+      <section>
+        <!-- buttons -->
+        <input type="image" src="dart-logo-original.png" class="filter" id="original" /><!-- first btn -->
+        <input type="image" src="dart-logo-sepia.png" class="filter" id="sepia" /><!-- third btn -->
+        <input type="image" src="dart-logo-greyscale.png" class="filter" id="greyscale" /><!-- second btn -->
+        <button id="share">Share!</button>
+      </section>
+    </div>
+    
+    <div class="view" id="doneView">
+      <!-- all done! -->
+      <h1>Picture shared!</h1>
+    </div>
+    <script type="application/dart" src="main.dart"></script>
+    <script src="packages/browser/dart.js"></script>
+  </body>
+</html>

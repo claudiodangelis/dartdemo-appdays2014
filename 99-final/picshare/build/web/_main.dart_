@@ -1,0 +1,55 @@
+import 'dart:html';
+import 'dart:js';
+import 'dart:async';
+import 'dart:typed_data';
+
+import 'package:picshare/picshare.dart';
+
+DivElement idleView = querySelector('#idleView');
+DivElement processImageView = querySelector('#processImageView');
+DivElement doneView = querySelector('#doneView');
+List views = [idleView, processImageView, doneView];
+
+void main() {
+  App app = new App();
+  querySelector('#take_picture').onClick.listen((e) {
+    var opts = new JsObject.jsify({
+      "name": "pick",
+      "data": {
+        "type": ["image/jpg", "image/jpeg"]
+      }
+    });
+    var pick = new JsObject(context["MozActivity"], [opts]);
+    pick["onsuccess"] = (_) {
+      print("Success! Proceding with process");
+      app.originalImage = pick["result"]["blob"];
+      app.generateThumbnail().then((img) {
+        // Future!
+        var ctx = app.canvasThumbnail.getContext('2d');
+        ctx.drawImageScaled(img, 0, 0, THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT);
+        querySelector('#sepia').onClick.listen((e) => app.applyFilter(1));
+        querySelector('#greyscale').onClick.listen((e) => app.applyFilter(2));
+        querySelector('#original').onClick.listen((e) => app.removeFilter());
+        querySelector('#share').onClick.listen((e) => app.renderImage());
+
+
+      });
+    };
+   
+    pick["onerror"] = (_) {
+      print("Oops! Something went wrong trying to take a picture :-(");
+    };
+  });
+}
+
+void showView(element) {
+  views.forEach((view) {
+    view.style
+      ..visibility = 'hidden'
+      ..display = 'none';
+  });
+  element.style
+    ..visibility = 'visible'
+    ..display = 'block';
+
+}
