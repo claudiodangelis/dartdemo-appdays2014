@@ -1,17 +1,21 @@
 import 'dart:html';
+import 'dart:math' as Math;
 import 'dart:js';
-import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:picshare/picshare.dart';
 
 DivElement idleView = querySelector('#idleView');
+DivElement filterImageView = querySelector('#filterImageView');
 DivElement processImageView = querySelector('#processImageView');
 DivElement doneView = querySelector('#doneView');
-List views = [idleView, processImageView, doneView];
+CanvasElement canvasThumbnail = querySelector('#canvasThumbnail');
+CanvasElement canvas = querySelector('#canvas');
+CanvasElement loading = querySelector('#loading');
+CanvasElement restartCanvas = querySelector('#restartCanvas');
+List views = [idleView, filterImageView, processImageView, doneView];
 
 void main() {
-  App app = new App();
+  App app = new App(canvasThumbnail, canvas);
   showView(idleView);
   querySelector('#take_picture').onClick.listen((e) {
     var opts = new JsObject.jsify({
@@ -23,7 +27,7 @@ void main() {
     var pick = new JsObject(context["MozActivity"], [opts]);
     pick["onsuccess"] = (_) {
       print("Success! Proceding with process");
-      showView(processImageView);
+      showView(filterImageView);
       app.loadPicture(pick["result"]["blob"]).then((Picture picture) {
         app.drawThumbnail();
         querySelector('#original').onClick.listen((e) {
@@ -52,6 +56,15 @@ void main() {
         });
         
         querySelector('#share').onClick.listen((e) {
+          showView(processImageView);
+          var ctx = loading.getContext('2d');
+          ctx
+            ..beginPath()
+            ..arc(150, 150, 100, 0, Math.PI * 2 * 0.9)
+            ..lineWidth = 1
+            ..strokeStyle = '#ccc'
+            ..stroke();
+          
           app.processPicture().then((Blob blob) {
             var shareOpts = new JsObject.jsify({
               "name": "share",
@@ -64,7 +77,24 @@ void main() {
             var shareActivity = new JsObject(context["MozActivity"], [shareOpts]);
             shareActivity["onsuccess"] = (_) {
               showView(doneView);
+              var ctx = restartCanvas.getContext('2d');
+              ctx
+                ..beginPath()
+                ..arc(150, 150,100, 0,2*Math.PI)
+                ..lineWidth = 5
+                ..fillStyle = '#55DDCA'
+                ..fill()
+                ..strokeStyle = '#00D2B8'
+                ..stroke()
+                ..beginPath()
+                ..lineWidth = 30
+                ..moveTo(70,150)
+                ..lineTo(140,200)
+                ..moveTo(142, 219)
+                ..lineTo(250, 50)
+                ..stroke();
             };
+            shareActivity["onerror"] = (_) => showView(filterImageView);
           });
         });
         
@@ -75,6 +105,8 @@ void main() {
       print("Oops! Something went wrong trying to take a picture :-(");
     };
   });
+  
+  querySelector('#restartBtn').onClick.listen((e) => showView(idleView));
 }
 
 void showView(element) {
