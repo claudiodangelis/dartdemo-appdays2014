@@ -8,35 +8,34 @@
   </head>
   <body>
     <div class="view" id="idleView">
-      <!-- input -->
       <h1>PicShare</h1>
       <h2>Codelab demo app: Take a picture and share it</h2>
-      <button id="take_picture">Take a picture!</button>
+      <button id="takePictureBtn">Take a picture!</button>
       <p><em>source code: <a href="https://github.com/claudiodangelis/dartdemo-appdays2014">github repository</a></em></p>
     </div>
     
     <div class="view" id="filterImageView">
-      <section id="display"><!-- display img -->
-        <canvas id="canvasThumbnail"></canvas>
+      <section id="display">
+        <div class="container">
+          <canvas id="canvasThumbnail"></canvas>
+        </div>
         <canvas id="canvas"></canvas>
       </section>
       <section>
-        <!-- buttons -->
-        <input type="image" src="dart-logo-original.png" class="filter" id="original" /><!-- first btn -->
-        <input type="image" src="dart-logo-sepia.png" class="filter" id="sepia" /><!-- third btn -->
-        <input type="image" src="dart-logo-greyscale.png" class="filter" id="greyscale" /><!-- second btn -->
+        <input type="image" src="dart-logo-original.png" class="filter" id="original" />
+        <input type="image" src="dart-logo-sepia.png" class="filter" id="sepia" />
+        <input type="image" src="dart-logo-greyscale.png" class="filter" id="greyscale" />
         <button id="share">Share!</button>
       </section>
     </div>
     
     <div class="view" id="processImageView">
       <h1>Processing the picture, please wait...</h1>
-      <div id="canvasContainer">
+      <div class="container">
         <canvas id="loading" width="300" height="300"></canvas>
       </div>
     </div>
     <div class="view" id="doneView">
-      <!-- all done! -->
       <h1>Picture shared!</h1>
       <canvas id="restartCanvas" width="300" height="300"></canvas>
       <button id="restartBtn">Restart</button>

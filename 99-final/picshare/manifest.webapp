@@ -1,5 +1,5 @@
 {
     "name": "picshare",
-    "description": "shoot a picture and share it",
+    "description": "Take a picture and share it.",
     "launch_path": "/build/web/picshare.html"
 }

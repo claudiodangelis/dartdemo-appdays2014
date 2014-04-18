@@ -1,62 +1,61 @@
 part of picshare;
 
 class App {
-  // Instance of `Picture'
+  // Instance of `Picture'.
   Picture picture;
-  final int THUMBNAIL_WIDTH = 288;
-  final int THUMBNAIL_HEIGHT = 385;
-  final int CANVAS_WIDTH = 1536;
-  final int CANVAS_HEIGHT = 2048;
-  CanvasElement canvas;
-  CanvasElement canvasThumbnail;
-  // FIXME: temporary workaround used to apply filter
-  ImageData blankCanvasImageData;
+  final int _THUMBNAIL_WIDTH = 288;
+  final int _THUMBNAIL_HEIGHT = 385;
+  final int _CANVAS_WIDTH = 1536;
+  final int _CANVAS_HEIGHT = 2048;
+  CanvasElement _canvas;
+  CanvasElement _canvasThumbnail;
+  // FIXME: temporary workaround used to apply filter.
+  ImageData _blankCanvasImageData;
   App(CanvasElement canvasThumbnail, CanvasElement canvas) {
-    this.canvasThumbnail = canvasThumbnail;
-    this.canvasThumbnail.width = THUMBNAIL_WIDTH;
-    this.canvasThumbnail.height = THUMBNAIL_HEIGHT;
-    this.canvas = canvas;
-    this.canvas.width = CANVAS_WIDTH;
-    this.canvas.height = CANVAS_HEIGHT;
+    _canvasThumbnail = canvasThumbnail;
+    _canvasThumbnail.width = _THUMBNAIL_WIDTH;
+    _canvasThumbnail.height = _THUMBNAIL_HEIGHT;
+    _canvas = canvas;
+    _canvas.width = _CANVAS_WIDTH;
+    _canvas.height = _CANVAS_HEIGHT;
     CanvasRenderingContext2D ctx = canvasThumbnail.getContext('2d');
-    this.blankCanvasImageData = ctx.getImageData(0, 0, THUMBNAIL_WIDTH,
-                                                       THUMBNAIL_HEIGHT);
+    _blankCanvasImageData = ctx.getImageData(0, 0, _THUMBNAIL_WIDTH,
+                                                   _THUMBNAIL_HEIGHT);
   }
   
+  // Gets the blob from MozActivity, creates a new instance of `Picture'.
   Future<Picture> loadPicture(Blob blob) {
     var completer = new Completer();
     var _picture = new Picture();
     var img = new ImageElement();
     img.src = Url.createObjectUrl(blob);
     img.onLoad.listen((e) {
-      var ctx = canvas.getContext('2d');
+      var ctx = _canvas.getContext('2d');
       ctx.drawImage(img, 0, 0);
       _picture._asImageElement = img;
-      this.picture = _picture;
-      this.picture.original = blob;
+      picture = _picture;
+      picture.blob = blob;
       completer.complete(picture);
     });
 
     return completer.future;
   }
   
+  // Draws first thumbnail.
   void drawThumbnail() {
-    // Draws first thumbnail
-    var ctx = canvasThumbnail.getContext('2d');
-    print("ottenuto ctx");
-    print(picture.asImageElement);
-    ctx.drawImageScaled(picture.asImageElement, 0, 0, THUMBNAIL_WIDTH,
-                                                      THUMBNAIL_HEIGHT);
+    var ctx = _canvasThumbnail.getContext('2d');
+    ctx.drawImageScaled(picture.asImageElement, 0, 0, _THUMBNAIL_WIDTH,
+                                                      _THUMBNAIL_HEIGHT);
     
-    // Stores original data to speed up filter removing
-    ImageData imgData = ctx.getImageData(0, 0, THUMBNAIL_WIDTH,
-                                               THUMBNAIL_HEIGHT);
-    picture.originalThumbnailData = imgData;
+    // Stores original data to speed up filter removing.
+    ImageData imgData = ctx.getImageData(0, 0, _THUMBNAIL_WIDTH,
+                                               _THUMBNAIL_HEIGHT);
+    picture._originalThumbnailData = imgData;
     picture.imageDataData = imgData.data;
   }
   
   void updateThumbnail(ImageData data) {
-    var ctx = canvasThumbnail.getContext('2d');
+    var ctx = _canvasThumbnail.getContext('2d');
     ctx.putImageData(data, 0, 0);
   }
   
@@ -66,21 +65,21 @@ class App {
     var _filteredImageData, _originalImageDataData, _width, _heigth;
     
     if (finalPicture) {
-      CanvasRenderingContext2D ctx = canvas.getContext('2d');
-      ImageData _canvasImageData = ctx.getImageData(0, 0, CANVAS_WIDTH,
-                                                          CANVAS_HEIGHT); 
+      CanvasRenderingContext2D ctx = _canvas.getContext('2d');
+      ImageData _canvasImageData = ctx.getImageData(0, 0, _CANVAS_WIDTH,
+                                                          _CANVAS_HEIGHT); 
       
       _filteredImageData = _canvasImageData;
       _originalImageDataData = _canvasImageData.data;
       
-      _width = CANVAS_WIDTH;
-      _heigth = CANVAS_HEIGHT;
+      _width = _CANVAS_WIDTH;
+      _heigth = _CANVAS_HEIGHT;
     } else {
-      _filteredImageData = blankCanvasImageData;
+      _filteredImageData = _blankCanvasImageData;
       _originalImageDataData = picture.imageDataData;
       
-      _width = THUMBNAIL_WIDTH;
-      _heigth = THUMBNAIL_HEIGHT;
+      _width = _THUMBNAIL_WIDTH;
+      _heigth = _THUMBNAIL_HEIGHT;
     }
     
     var completer = new Completer();
@@ -100,18 +99,15 @@ class App {
   }
   
   Future<Blob> processPicture() {
-    print("Starting process to export picture");
     var completer = new Completer();
     if (picture.filtered) {
-      print("Picture filtered, applying filter");
-      // Using temporary big invisible canvas
-      this.filterPicture(picture.filter, finalPicture: true)
+      // Using big invisible canvas.
+      filterPicture(picture.filter, finalPicture: true)
       .then((ImageData data) {
-        print("Image successfully filtered");
-        print("proceding creating blob");
-        CanvasRenderingContext2D ctx = canvas.getContext('2d');
+        CanvasRenderingContext2D ctx = _canvas.getContext('2d');
         ctx.putImageData(data, 0, 0);
-        var dataUri = canvas.toDataUrl('image/jpg');
+        // Creates and returns a blob.
+        var dataUri = _canvas.toDataUrl('image/jpg');
         var byteString = window.atob(dataUri.split(',')[1]);
         var mimeString = dataUri.split(',')[0].split(':')[1].split(';')[0];
         var arrayBuffer = new Uint8List(byteString.length);
@@ -122,9 +118,16 @@ class App {
         completer.complete(new Blob([arrayBuffer], 'image/jpg'));  
       });
     } else {
-      print("Picture is not filtered, yelding original blob");
-      completer.complete(picture.original);
+      completer.complete(picture.blob);
     }
     return completer.future;
+  }
+  
+  // Clear canvases.
+  void reset() {
+    var thumbnailCtx = _canvasThumbnail.getContext('2d');
+    var ctx = _canvas.getContext('2d');
+    thumbnailCtx.clearRect(0, 0, _THUMBNAIL_WIDTH, _THUMBNAIL_HEIGHT);
+    ctx.clearRect(0, 0, _CANVAS_WIDTH, _CANVAS_HEIGHT);
   }
 }
