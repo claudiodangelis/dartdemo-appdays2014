@@ -8,7 +8,7 @@ _[1] Building a Firefox OS Open Web App with Dart_
 **Description**
 Simple app that lets you take a picture, apply a filter (sepia or greyscale tone) then share it.
 
-** Features
+**Features**
 
 - Dart: language overview, asynchronous programming, built-in libraries, Javascript interoperability
 
