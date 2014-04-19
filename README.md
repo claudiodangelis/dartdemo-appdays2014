@@ -28,6 +28,10 @@ Beginner
 
 - Read this: [Using the App Manager](https://developer.mozilla.org/en-US/Firefox_OS/Using_the_App_Manager) (from [MDN](https://developer.mozilla.org)).
 
+**Screenshot**
+
+![Screenshot](screenshot.png)
+
 ## License
 
 MIT License (See [LICENSE](LICENSE)), Claudio d'Angelis <claudiodangelis@gmail.com>
