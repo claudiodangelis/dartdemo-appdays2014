@@ -1,7 +1,6 @@
 part of picshare;
 
 class App {
-  // Instance of `Picture'.
   Picture picture;
   final int _THUMBNAIL_WIDTH = 288;
   final int _THUMBNAIL_HEIGHT = 385;
@@ -9,7 +8,6 @@ class App {
   final int _CANVAS_HEIGHT = 2048;
   CanvasElement _canvas;
   CanvasElement _canvasThumbnail;
-  // FIXME: temporary workaround used to apply filter.
   ImageData _blankCanvasImageData;
 
   App(CanvasElement canvasThumbnail, CanvasElement canvas) {
@@ -23,8 +21,7 @@ class App {
     _blankCanvasImageData = ctx.getImageData(0, 0, _THUMBNAIL_WIDTH,
                                                    _THUMBNAIL_HEIGHT);
   }
-  
-  // Gets the blob from MozActivity, creates a new instance of `Picture'.
+
   Future<Picture> loadPicture(Blob blob) {
     var completer = new Completer();
     var _picture = new Picture();
@@ -42,25 +39,22 @@ class App {
     return completer.future;
   }
   
-  // Draws first thumbnail.
   void drawThumbnail() {
     var ctx = _canvasThumbnail.getContext('2d');
     ctx.drawImageScaled(picture.asImageElement, 0, 0, _THUMBNAIL_WIDTH,
                                                       _THUMBNAIL_HEIGHT);
     
-    // Stores original data to speed up filter removing.
     ImageData imgData = ctx.getImageData(0, 0, _THUMBNAIL_WIDTH,
                                                _THUMBNAIL_HEIGHT);
     picture._originalThumbnailData = imgData;
     picture.imageDataData = imgData.data;
   }
-  
+
   void updateThumbnail(ImageData data) {
     var ctx = _canvasThumbnail.getContext('2d');
     ctx.putImageData(data, 0, 0);
   }
-  
-  
+
   Future<ImageData> filterPicture(int filter, {bool finalPicture: false}) {
     
     var _filteredImageData, _originalImageDataData, _width, _heigth;
@@ -98,16 +92,14 @@ class App {
     completer.complete(_filteredImageData);
     return completer.future;
   }
-  
+
   Future<Blob> processPicture() {
     var completer = new Completer();
     if (picture.filtered) {
-      // Using big invisible canvas.
       filterPicture(picture.filter, finalPicture: true)
       .then((ImageData data) {
         CanvasRenderingContext2D ctx = _canvas.getContext('2d');
         ctx.putImageData(data, 0, 0);
-        // Creates and returns a blob.
         var dataUri = _canvas.toDataUrl('image/jpg');
         var byteString = window.atob(dataUri.split(',')[1]);
         var mimeString = dataUri.split(',')[0].split(':')[1].split(';')[0];
@@ -124,7 +116,6 @@ class App {
     return completer.future;
   }
   
-  // Clear canvases.
   void reset() {
     var thumbnailCtx = _canvasThumbnail.getContext('2d');
     var ctx = _canvas.getContext('2d');

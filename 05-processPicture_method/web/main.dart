@@ -1,14 +1,9 @@
-// Imports.
- 
-// Built-in libraries (`dart:*').
 import 'dart:html';
 import 'dart:js';
-import 'dart:math' as Math; //
+import 'dart:math' as Math;
 
-// Libraries managed by `pub'.
 import 'package:picshare/picshare.dart';
 
-// Top-level DOM elements.
 DivElement idleView = querySelector('#idleView');
 DivElement filterImageView = querySelector('#filterImageView');
 DivElement processImageView = querySelector('#processImageView');
@@ -18,31 +13,22 @@ CanvasElement canvas = querySelector('#canvas');
 CanvasElement loading = querySelector('#loading');
 CanvasElement restartCanvas = querySelector('#restartCanvas');
 
-// List of elements, we need this to switch quickly between app views.
 List views = [idleView, filterImageView, processImageView, doneView];
 
-// The entry-point. 
 main() {
-  // Creates a new instance of `App'.
   App app = new App(canvasThumbnail, canvas);
-  // Sets a view.
   showView(idleView);
-  // Selects a DOM element.
   querySelector('#takePictureBtn').onClick.listen((e) {
-    // Creates a JS object from a Dart object (a map).
     var opts = new JsObject.jsify({
       "name": "pick",
       "data": {
         "type": ["image/jpg", "image/jpeg"]
       }
     });
-    // Creates a new JS Object (MozActivity(...)).
     var pick = new JsObject(context["MozActivity"], [opts]);
     pick["onsuccess"] = (_) {
       showView(filterImageView);
-      // Loads the blob returned by MozActivity. `loadPicture()' is a `Future'.
       app.loadPicture(pick["result"]["blob"]).then((Picture picture) {
-        // Draws the initial thumbnail.
         app.drawThumbnail();
         querySelector('#original').onClick.listen((e) {
           if (picture.filtered) {
@@ -109,7 +95,6 @@ main() {
                 ..lineTo(250, 50)
                 ..stroke();
             };
-            
             //TODO: What if user cancels share activity?
           });
         });
@@ -124,7 +109,6 @@ main() {
   querySelector('#restartBtn').onClick.listen((e) => showView(idleView));
 }
 
-// Hides all views, shows the passed one.
 void showView(element) {
   views.forEach((view) {
     view.style
