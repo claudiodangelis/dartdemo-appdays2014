@@ -20,7 +20,7 @@ Beginner
 **Length**
 2 hrs
 
-## Running the demo app
+## Running the app
 
 - Get the code: `git clone https://github.com/claudiodangelis/dartdemo-appdays2014.git`
 
