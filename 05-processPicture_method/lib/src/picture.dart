@@ -17,10 +17,10 @@ class Picture {
   int get filter => _filter;
   ImageElement get asImageElement => _asImageElement;
 
-  bool get isSepia => _filter == 1 ? true : false;
+  bool get isSepia => _filter == 1;
 
   set filter(int value) {
     _filter = value;
-    _filtered = value > 0 ? true : false;
+    _filtered = value > 0;
   }
 }

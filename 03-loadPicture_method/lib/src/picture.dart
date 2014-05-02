@@ -16,6 +16,6 @@ class Picture {
 
   set filter(int value) {
     _filter = value;
-    _filtered = value > 0 ? true : false;
+    _filtered = value > 0;
   }
 }

@@ -24,12 +24,12 @@ class Picture {
   int get filter => _filter;
   ImageElement get asImageElement => _asImageElement;
 
-  bool get isSepia => _filter == 1 ? true : false;
+  bool get isSepia => _filter == 1;
   
   // A setter. `filtered' value depends on `filter' value so we don't need to
   // set it manually.
   set filter(int value) {
     _filter = value;
-    _filtered = value > 0 ? true : false;
+    _filtered = value > 0;
   }
 }
